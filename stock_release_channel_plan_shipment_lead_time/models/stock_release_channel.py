@@ -12,6 +12,7 @@ class StockReleaseChannel(models.Model):
         "release_channel_delivery_weekday_rel",
         "channel_id",
         "weekday_id",
+        string="Delivery weekdays",
     )
     preparation_weekday_ids = fields.Many2many(
         "time.weekday",

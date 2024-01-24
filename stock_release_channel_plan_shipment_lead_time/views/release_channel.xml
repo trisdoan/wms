@@ -9,7 +9,7 @@
         />
         <field name="arch" type="xml">
             <field name="shipment_lead_time" position="after">
-                <field name="delivery_weekday_ids" />
+                <field name="delivery_weekday_ids" widget="many2many_tags" />
             </field>
         </field>
     </record>
