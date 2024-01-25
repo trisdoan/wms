@@ -7,7 +7,6 @@ from odoo.fields import Command
 from odoo.addons.stock_release_channel.tests.common import ReleaseChannelCase
 
 
-@freeze_time("2024-01-01")  # Monday
 class TestReleaseChannelLeadTimeWeekday(ReleaseChannelCase):
     @classmethod
     def setUpClass(cls):
@@ -49,84 +48,108 @@ class TestReleaseChannelLeadTimeWeekday(ReleaseChannelCase):
                 cls.env["time.weekday"].search([("name", "=", val)], limit=1),
             )
 
-        cls.default_channel.shipment_lead_time = 3
-
     def test_preparation_weekday_with_calendar(self):
         self.warehouse.calendar_id = self.calendar
-        self.assertFalse(self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.monday.id)]}
-        )
-        self.assertIn(self.wednesday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
-        )
-        self.assertIn(self.thursday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
-        )
-        self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
-        )
-        self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
+        # Loop over a complete week and use freeze time to ensure computation does not
+        #  rely on today
+        for weekday in range(1, 8):
+            self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
+            with freeze_time("2024-01-0%s" % weekday):
+                self.assertFalse(self.default_channel.preparation_weekday_ids)
+                self.default_channel.shipment_lead_time = 3
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.monday.id)]}
+                )
+                self.assertIn(
+                    self.wednesday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
+                )
+                self.assertIn(
+                    self.thursday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
+                )
+                self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
+                )
+                self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
 
-        self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
-        self.default_channel.shipment_lead_time = 10
+                self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
+                self.default_channel.shipment_lead_time = 10
 
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.monday.id)]}
-        )
-        self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
-        )
-        self.assertIn(self.tuesday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
-        )
-        self.assertIn(self.wednesday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
-        )
-        self.assertIn(self.thursday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.monday.id)]}
+                )
+                self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
+                )
+                self.assertIn(
+                    self.tuesday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
+                )
+                self.assertIn(
+                    self.wednesday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
+                )
+                self.assertIn(
+                    self.thursday, self.default_channel.preparation_weekday_ids
+                )
 
     def test_preparation_weekday_without_calendar(self):
         self.assertFalse(self.warehouse.calendar_id)
-        self.assertFalse(self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.monday.id)]}
-        )
-        self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
-        )
-        self.assertIn(self.saturday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
-        )
-        self.assertIn(self.sunday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
-        )
-        self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
+        # Loop over a complete week and use freeze time to ensure computation does not
+        #  rely on today
+        for weekday in range(1, 8):
+            self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
+            with freeze_time("2024-01-0%s" % weekday):
+                self.assertFalse(self.default_channel.preparation_weekday_ids)
+                self.default_channel.shipment_lead_time = 3
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.monday.id)]}
+                )
+                self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
+                )
+                self.assertIn(
+                    self.saturday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
+                )
+                self.assertIn(self.sunday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
+                )
+                self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
 
-        self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
-        self.default_channel.shipment_lead_time = 10
+                self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
+                self.default_channel.shipment_lead_time = 10
 
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.monday.id)]}
-        )
-        self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
-        )
-        self.assertIn(self.saturday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
-        )
-        self.assertIn(self.sunday, self.default_channel.preparation_weekday_ids)
-        self.default_channel.write(
-            {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
-        )
-        self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.monday.id)]}
+                )
+                self.assertIn(self.friday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.tuesday.id)]}
+                )
+                self.assertIn(
+                    self.saturday, self.default_channel.preparation_weekday_ids
+                )
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
+                )
+                self.assertIn(self.sunday, self.default_channel.preparation_weekday_ids)
+                self.default_channel.write(
+                    {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
+                )
+                self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
