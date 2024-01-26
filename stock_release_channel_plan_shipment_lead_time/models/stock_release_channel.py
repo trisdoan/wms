@@ -35,9 +35,7 @@ class StockReleaseChannel(models.Model):
                     #  that is open.
                     # It's not perfect, but it's less wrong than only deducing the days
                     #  without consideration of closed days on weekends
-                    date_from = fields.Date.today()
-                    while date_from.weekday() != int(wd.name):
-                        date_from = fields.Date.add(date_from, days=1)
+                    date_from = wd._get_next_weekday_date()
                     date_from_minus_lead = channel.warehouse_id.calendar_id.plan_days(
                         -channel.shipment_lead_time,
                         fields.Datetime.to_datetime(date_from),
