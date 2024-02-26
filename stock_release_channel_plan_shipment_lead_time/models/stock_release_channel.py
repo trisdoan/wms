@@ -33,8 +33,8 @@ class StockReleaseChannel(models.Model):
                     #  from today on whose weekday matches with current delivery weekday.
                     # We then deduce the lead time using the calendar to find a weekday
                     #  that is open.
-                    # It's not perfect, but it's less wrong than only deducing the days
-                    #  without consideration of closed days on weekends
+                    # As this serves for helping in configuring the static preparation
+                    #  plan, we do not consider here the leaves.
                     date_from = wd._get_next_weekday_date()
                     date_from_minus_lead = channel.warehouse_id.calendar_id.plan_days(
                         -channel.shipment_lead_time,
